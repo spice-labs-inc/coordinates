@@ -1,5 +1,12 @@
 # 🧭 coordinates
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.spicelabs/coordinates?label=Maven%20Central)](https://central.sonatype.com/artifact/io.spicelabs/coordinates)
+[![npm](https://img.shields.io/npm/v/%40spicelabs/coordinates?label=npm)](https://www.npmjs.com/package/@spicelabs/coordinates)
+[![crates.io](https://img.shields.io/crates/v/spice-coordinates?label=crates.io)](https://crates.io/crates/spice-coordinates)
+[![GitHub Release](https://img.shields.io/github/v/release/spice-labs-inc/coordinates?label=GitHub%20Release)](https://github.com/spice-labs-inc/coordinates/releases)
+[![conformance](https://github.com/spice-labs-inc/coordinates/actions/workflows/conformance.yml/badge.svg)](https://github.com/spice-labs-inc/coordinates/actions/workflows/conformance.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 Canonical, verifiable identifiers for software artifacts — the **intrinsic** content hashes and **extrinsic** package coordinates that Spice Labs tooling agrees on. One definition, shared test vectors, and conforming implementations in every language we use.
 
 We map software by what it _is_, not what it's labelled — so the identifiers everything joins on have to be computed _identically_ everywhere. `coordinates` is the single source of truth: define each identifier once, prove it with shared vectors, and make every implementation conform.
@@ -38,7 +45,7 @@ purl.build({ type: "npm", name: "lodash", version: "4.17.21" }); // "pkg:npm/lod
 <dependency>
   <groupId>io.spicelabs</groupId>
   <artifactId>coordinates</artifactId>
-  <version>0.1.0</version>
+  <version>0.0.1</version>
 </dependency>
 ```
 
@@ -56,7 +63,7 @@ p.toCanonical(); // "pkg:maven/org.apache.commons/io@1.3.4"
 **Scala** — the Java artifact, no separate build (note the single `%`):
 
 ```scala
-libraryDependencies += "io.spicelabs" % "coordinates" % "0.1.0"
+libraryDependencies += "io.spicelabs" % "coordinates" % "0.0.1"
 
 import io.spicelabs.coordinates.{Coordinates, Purl}
 Coordinates.sha256(bytes) // "ba7816bf…"

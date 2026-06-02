@@ -10,7 +10,7 @@ JDK-only — `java.security.MessageDigest`, **zero runtime dependencies**, Java 
 <dependency>
   <groupId>io.spicelabs</groupId>
   <artifactId>coordinates</artifactId>
-  <version>0.1.0</version>
+  <version>0.0.1</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ new Purl("npm", null, "lodash", "4.17.21", null, null).toCanonical(); // "pkg:np
 Scala (and any other JVM language) uses this same artifact — there is no separate Scala build. Note the single `%` (not `%%`): it is a plain Java jar with no Scala-version suffix.
 
 ```scala
-libraryDependencies += "io.spicelabs" % "coordinates" % "0.1.0"
+libraryDependencies += "io.spicelabs" % "coordinates" % "0.0.1"
 
 import io.spicelabs.coordinates.{Coordinates, Purl}
 
