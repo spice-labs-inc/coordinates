@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Browser smoke test: runs the built TS implementation in a real browser (Web Crypto + the
+     vendored MD5) against the shared vectors. Serve the repo root and open this file;
+     `pnpm run smoke` does both. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>coordinates — browser smoke test</title>
+    <style>
+      body {
+        font: 14px/1.5 monospace;
+        padding: 1.5rem;
+      }
+      .ok {
+        color: #157f3b;
+      }
+      .fail {
+        color: #c0202a;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>coordinates — browser smoke test</h1>
+    <p>
+      The TypeScript implementation, run in this browser against
+      <code>../../vectors/intrinsic.json</code>.
+    </p>
+    <pre id="out">running…</pre>
+    <script type="module">
+      import { intrinsic } from "../dist/index.js";
+
+      const out = document.getElementById("out");
+      const line = (text, cls) => {
+        const el = document.createElement("span");
+        if (cls) el.className = cls;
+        el.textContent = text + "\n";
+        out.appendChild(el);
+      };
+
+      const hexToBytes = (hex) => {
+        const bytes = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+        return bytes;
+      };
+
+      try {
+        out.textContent = "";
+        const suite = await (await fetch("../../vectors/intrinsic.json")).json();
+        let pass = 0;
+        let fail = 0;
+        for (const v of suite.vectors) {
+          const got = await intrinsic(hexToBytes(v.input_hex));
+          for (const [id, expected] of Object.entries(v.expect)) {
+            if (got[id] === expected) pass++;
+            else {
+              fail++;
+              line(`FAIL  ${v.name}  ${id}\n  got  ${got[id]}\n  want ${expected}`, "fail");
+            }
+          }
+        }
+        line(
+          `${fail === 0 ? "PASS" : "FAIL"} — ${pass} passed, ${fail} failed`,
+          fail === 0 ? "ok" : "fail"
+        );
+        document.title = fail === 0 ? "PASS" : "FAIL";
+      } catch (err) {
+        line("ERROR: " + (err && err.stack ? err.stack : err), "fail");
+        document.title = "ERROR";
+      }
+    </script>
+  </body>
+</html>

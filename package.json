@@ -1,0 +1,13 @@
+{
+  "name": "@spice-labs/coordinates-repo",
+  "private": true,
+  "description": "Repo tooling for spice-labs-inc/coordinates (formatting of TS, JSON, Markdown, YAML). Not published.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
+}

@@ -1,0 +1,76 @@
+# coordinates — the canonical definition of every identifier Spice Labs tooling agrees on.
+#
+# Single source of truth: implementations are built from this, the test vectors are generated
+# from it, and CI proves both. Change an identifier's behavior here first.
+#
+# On rigor: the heavy primitives (SHA, MD5) are fully defined by the cited standards, so we do
+# not restate them. The only things THIS file defines are the framing, the hex encoding, and the
+# output grammar — given exactly below as pseudocode + ABNF, so there is no prose to interpret.
+
+version: 0.1.0
+
+# Domains
+#   input  : a sequence of bytes (length >= 0)
+#   output : a string in `grammar` for that identifier
+#   Every identifier is a total function — defined for all inputs.
+
+# Intrinsic — derived purely from the input bytes.
+#   output: hex     ->  hex(input)     (see constructions)
+#   output: gitoid  ->  gitoid(input)  (see constructions)
+# Content aliases for lookup, NOT security primitives: md5, sha1, and gitoid-blob-sha1 use
+# collision-broken digests. Never use them for integrity, signing, or trust decisions.
+intrinsic:
+  md5: { digest: MD5, output: hex, ref: rfc-1321 }
+  sha1: { digest: SHA-1, output: hex, ref: fips-180-4 }
+  sha256: { digest: SHA-256, output: hex, ref: fips-180-4 }
+  sha512: { digest: SHA-512, output: hex, ref: fips-180-4 }
+  gitoid-blob-sha1: { digest: SHA-1, output: gitoid, ref: [git-object-format, fips-180-4] }
+  gitoid-blob-sha256: { digest: SHA-256, output: gitoid, ref: [git-object-format, fips-180-4] }
+
+# Extrinsic — assigned coordinates, not derived from content.
+extrinsic:
+  purl:
+    conforms-to: purl-spec # we implement the spec and reuse its test suite; we don't restate it
+    operations: [parse, build, normalize, validate]
+    struct:
+      {
+        type: string,
+        namespace: string?,
+        name: string,
+        version: string?,
+        qualifiers: map,
+        subpath: string?
+      }
+    # parse : string -> struct      build : struct -> string   (both apply the type's rules, so output is canonical)
+    # normalize : struct -> struct (case folding + per-type name rules)
+    # validate : namespace required/prohibited + per-type checks (raises on violation)
+
+# Constructions — DIGEST is the entry's `digest`; name(SHA-1)="sha1", name(SHA-256)="sha256".
+constructions:
+  hex: "hex(input)    = lower_hex( DIGEST(input) )"
+  gitoid: 'gitoid(input) = "gitoid:blob:" ++ name(DIGEST) ++ ":" ++ lower_hex( DIGEST( framing(input) ) )'
+  framing: |
+    framing(content) = ascii("blob ") ++ ascii(decimal(len(content))) ++ [0x00] ++ content
+      ; ascii("blob ") is the 5 bytes 62 6C 6F 62 20
+      ; decimal(len(content)) is the byte length in base-10 ASCII, no leading zeros ("0" for empty)
+      ; then a single NUL byte, then the content — all one digest input. Equals `git hash-object`.
+  lower_hex: "lower_hex(bytes) = each byte -> two lowercase hex digits, high nibble first (RFC 4648 §8)"
+
+# Grammar — ABNF (RFC 5234) for the output strings.
+grammar: |
+  hex-digit     = %x30-39 / %x61-66            ; 0-9 a-f, lowercase only
+  md5           = 32hex-digit
+  sha1          = 40hex-digit
+  sha256        = 64hex-digit
+  sha512        = 128hex-digit
+  gitoid-sha1   = "gitoid:blob:sha1:"   40hex-digit
+  gitoid-sha256 = "gitoid:blob:sha256:" 64hex-digit
+  ; the purl output grammar is defined by purl-spec (see extrinsic.purl.conforms-to)
+
+references:
+  git-object-format: https://git-scm.com/book/en/v2/Git-Internals-Git-Objects
+  fips-180-4: NIST FIPS 180-4 — Secure Hash Standard (SHA-1, SHA-256, SHA-512)
+  rfc-1321: RFC 1321 — The MD5 Message-Digest Algorithm
+  rfc-4648: RFC 4648 §8 — Base16 (hex) encoding
+  rfc-5234: RFC 5234 — Augmented BNF for Syntax Specifications (ABNF)
+  purl-spec: https://github.com/package-url/purl-spec

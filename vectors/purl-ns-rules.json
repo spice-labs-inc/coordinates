@@ -1,0 +1,223 @@
+{
+  "$schema": "https://packageurl.org/schemas/purl-test.schema-0.1.json",
+  "description": "Spice Labs synthetic per-type namespace-rule vectors (NOT vendored from purl-spec). One parse case per type that isolates the namespace required/prohibited rule, so cross-impl rule-table drift is caught by the shared conformance suite. Derived from each type definition's namespace requirement: 14 required + 17 prohibited.",
+  "tests": [
+    {
+      "description": "namespace is required for alpm",
+      "test_type": "parse",
+      "input": "pkg:alpm/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for apk",
+      "test_type": "parse",
+      "input": "pkg:apk/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for bitbucket",
+      "test_type": "parse",
+      "input": "pkg:bitbucket/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for composer",
+      "test_type": "parse",
+      "input": "pkg:composer/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for cpan",
+      "test_type": "parse",
+      "input": "pkg:cpan/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for deb",
+      "test_type": "parse",
+      "input": "pkg:deb/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for github",
+      "test_type": "parse",
+      "input": "pkg:github/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for golang",
+      "test_type": "parse",
+      "input": "pkg:golang/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for huggingface",
+      "test_type": "parse",
+      "input": "pkg:huggingface/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for maven",
+      "test_type": "parse",
+      "input": "pkg:maven/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for qpkg",
+      "test_type": "parse",
+      "input": "pkg:qpkg/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for rpm",
+      "test_type": "parse",
+      "input": "pkg:rpm/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for swift",
+      "test_type": "parse",
+      "input": "pkg:swift/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is required for vscode-extension",
+      "test_type": "parse",
+      "input": "pkg:vscode-extension/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for bazel",
+      "test_type": "parse",
+      "input": "pkg:bazel/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for bitnami",
+      "test_type": "parse",
+      "input": "pkg:bitnami/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for cargo",
+      "test_type": "parse",
+      "input": "pkg:cargo/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for chrome-extension",
+      "test_type": "parse",
+      "input": "pkg:chrome-extension/ns/abcdefghijklmnopabcdefghijklmnop",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for cocoapods",
+      "test_type": "parse",
+      "input": "pkg:cocoapods/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for conda",
+      "test_type": "parse",
+      "input": "pkg:conda/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for cran",
+      "test_type": "parse",
+      "input": "pkg:cran/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for gem",
+      "test_type": "parse",
+      "input": "pkg:gem/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for hackage",
+      "test_type": "parse",
+      "input": "pkg:hackage/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for julia",
+      "test_type": "parse",
+      "input": "pkg:julia/ns/name?uuid=ade2ca70-3891-5945-98fb-dc099432e06a",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for mlflow",
+      "test_type": "parse",
+      "input": "pkg:mlflow/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for nuget",
+      "test_type": "parse",
+      "input": "pkg:nuget/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for oci",
+      "test_type": "parse",
+      "input": "pkg:oci/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for opam",
+      "test_type": "parse",
+      "input": "pkg:opam/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for otp",
+      "test_type": "parse",
+      "input": "pkg:otp/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for pub",
+      "test_type": "parse",
+      "input": "pkg:pub/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "namespace is prohibited for pypi",
+      "test_type": "parse",
+      "input": "pkg:pypi/ns/name",
+      "expected_output": null,
+      "expected_failure": true
+    }
+  ]
+}

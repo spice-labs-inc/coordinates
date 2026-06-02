@@ -1,0 +1,12 @@
+# Build output — Maven, sbt, and Cargo all use target/
+target/
+
+# Node / TypeScript
+node_modules/
+dist/
+
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+.DS_Store
