@@ -1,4 +1,4 @@
-# @spice-labs/coordinates (TypeScript)
+# @spicelabs/coordinates (TypeScript)
 
 The TypeScript implementation of [`coordinates`](../). Conforms to [`../spec.yaml`](../spec.yaml) and is verified against the shared [`../vectors/`](../vectors) in CI.
 
@@ -11,13 +11,13 @@ In the browser, the SHA functions need a **secure context** (https, or localhost
 ## Use
 
 ```bash
-npm install @spice-labs/coordinates
+npm install @spicelabs/coordinates
 ```
 
 Intrinsic — content hashes and git blob ids:
 
 ```ts
-import { sha256, gitoidBlobSha256, intrinsic } from "@spice-labs/coordinates";
+import { sha256, gitoidBlobSha256, intrinsic } from "@spicelabs/coordinates";
 
 const bytes = new TextEncoder().encode("abc");
 await sha256(bytes); // "ba7816bf…"
@@ -28,7 +28,7 @@ await intrinsic(bytes); // { md5, sha1, sha256, sha512, "gitoid-blob-sha1", "git
 Extrinsic — purl, parsed to a typed object and built back to canonical form:
 
 ```ts
-import { purl } from "@spice-labs/coordinates";
+import { purl } from "@spicelabs/coordinates";
 
 purl.parse("pkg:npm/%40angular/core@17.0.0");
 // { type: "npm", namespace: "@angular", name: "core", version: "17.0.0", qualifiers: {}, subpath: null }

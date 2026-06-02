@@ -1,5 +1,5 @@
 {
-  "name": "@spice-labs/coordinates",
+  "name": "@spicelabs/coordinates",
   "version": "0.0.0",
   "description": "Canonical content identifiers (content hashes + git blob ids) and package coordinates (purl) for software artifacts — the TypeScript implementation of spice-labs-inc/coordinates.",
   "license": "Apache-2.0",
@@ -30,7 +30,7 @@
     "sha256",
     "content-hash",
     "artifact-identifier",
-    "spice-labs"
+    "spicelabs"
   ],
   "repository": {
     "type": "git",

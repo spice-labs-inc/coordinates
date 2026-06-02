@@ -1,5 +1,5 @@
 {
-  "name": "@spice-labs/coordinates-repo",
+  "name": "@spicelabs/coordinates-repo",
   "private": true,
   "description": "Repo tooling for spice-labs-inc/coordinates (formatting of TS, JSON, Markdown, YAML). Not published.",
   "license": "Apache-2.0",

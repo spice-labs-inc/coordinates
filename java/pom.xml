@@ -163,7 +163,8 @@
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>
-              <autoPublish>true</autoPublish>
+              <!-- false for now: the deployment uploads but waits for a manual release in the Central Portal -->
+              <autoPublish>false</autoPublish>
               <checksums>all</checksums>
             </configuration>
           </plugin>

@@ -16,14 +16,14 @@ If an implementation disagrees with the vectors — or the vectors with the spec
 
 One package per runtime; Scala (and any JVM language) uses the Java one.
 
-**TypeScript / JavaScript** — `@spice-labs/coordinates` (npm), isomorphic (Node + browser), async:
+**TypeScript / JavaScript** — `@spicelabs/coordinates` (npm), isomorphic (Node + browser), async:
 
 ```bash
-npm install @spice-labs/coordinates
+npm install @spicelabs/coordinates
 ```
 
 ```ts
-import { sha256, gitoidBlobSha256, purl } from "@spice-labs/coordinates";
+import { sha256, gitoidBlobSha256, purl } from "@spicelabs/coordinates";
 await sha256(bytes); // "ba7816bf…"
 await gitoidBlobSha256(bytes); // "gitoid:blob:sha256:…"  (== git hash-object)
 
