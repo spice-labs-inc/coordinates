@@ -1,0 +1,46 @@
+{
+  "name": "@spice-labs/coordinates",
+  "version": "0.0.0",
+  "description": "Canonical content identifiers (content hashes + git blob ids) and package coordinates (purl) for software artifacts — the TypeScript implementation of spice-labs-inc/coordinates.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsc -p tsconfig.json && node --test test/conformance.test.mjs test/purl.test.mjs",
+    "smoke": "tsc -p tsconfig.json && node test/serve.mjs"
+  },
+  "keywords": [
+    "gitoid",
+    "git-hash-object",
+    "sha256",
+    "content-hash",
+    "artifact-identifier",
+    "spice-labs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spice-labs-inc/coordinates.git",
+    "directory": "ts"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
