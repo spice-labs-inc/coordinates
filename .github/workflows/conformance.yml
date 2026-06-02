@@ -11,17 +11,17 @@ on:
 jobs:
   vectors:
     name: vectors valid
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
       - run: node vectors/validate.mjs
 
   ts:
     name: ts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ts
@@ -32,7 +32,7 @@ jobs:
           version: 11
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: pnpm
           cache-dependency-path: ts/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
@@ -41,7 +41,7 @@ jobs:
 
   java:
     name: java
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: java
@@ -56,7 +56,7 @@ jobs:
 
   rust:
     name: rust
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: rust

@@ -13,7 +13,7 @@ permissions:
 jobs:
   setup:
     name: version + notify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.version.outputs.version }}
       thread-ts: ${{ steps.notify.outputs.thread-ts }}
@@ -42,7 +42,7 @@ jobs:
   npm:
     name: npm
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       id-token: write # npm provenance
@@ -56,7 +56,7 @@ jobs:
           version: 11
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
           cache: pnpm
           cache-dependency-path: ts/pnpm-lock.yaml
@@ -71,7 +71,7 @@ jobs:
   cargo:
     name: cargo
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: rust
@@ -88,7 +88,7 @@ jobs:
   maven:
     name: maven central + github packages
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
@@ -136,7 +136,7 @@ jobs:
     name: notify result
     needs: [setup, npm, cargo, maven]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Determine overall status
         id: status
