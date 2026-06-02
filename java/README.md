@@ -39,6 +39,20 @@ p.toCanonical(); // "pkg:maven/org.apache.commons/io@1.3.4"
 new Purl("npm", null, "lodash", "4.17.21", null, null).toCanonical(); // "pkg:npm/lodash@4.17.21"
 ```
 
+## From Scala
+
+Scala (and any other JVM language) uses this same artifact — there is no separate Scala build. Note the single `%` (not `%%`): it is a plain Java jar with no Scala-version suffix.
+
+```scala
+libraryDependencies += "io.spicelabs" % "coordinates" % "0.1.0"
+
+import io.spicelabs.coordinates.{Coordinates, Purl}
+
+Coordinates.sha256(bytes) // "ba7816bf…"
+Coordinates.gitoidBlobSha256(bytes) // "gitoid:blob:sha256:c1cf…"
+Purl.parse("pkg:maven/org.apache.commons/io@1.3.4").name // "io"
+```
+
 ## Develop
 
 ```bash
