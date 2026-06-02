@@ -45,7 +45,7 @@ purl.build({ type: "npm", name: "lodash", version: "4.17.21" }); // "pkg:npm/lod
 <dependency>
   <groupId>io.spicelabs</groupId>
   <artifactId>coordinates</artifactId>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
@@ -63,7 +63,7 @@ p.toCanonical(); // "pkg:maven/org.apache.commons/io@1.3.4"
 **Scala** — the Java artifact, no separate build (note the single `%`):
 
 ```scala
-libraryDependencies += "io.spicelabs" % "coordinates" % "0.0.1"
+libraryDependencies += "io.spicelabs" % "coordinates" % "1.0.0"
 
 import io.spicelabs.coordinates.{Coordinates, Purl}
 Coordinates.sha256(bytes) // "ba7816bf…"
