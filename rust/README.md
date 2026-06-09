@@ -19,6 +19,20 @@ coordinates::gitoid_blob_sha256(bytes); // "gitoid:blob:sha256:c1cf…"  (== `gi
 coordinates::intrinsic(bytes);          // [(name, value); 6]
 ```
 
+Streaming — for a large artifact you don't want to hold in memory, feed it in chunks (or straight from a reader) and get the same six identifiers in one pass. The length is required up front because `gitoid` framing embeds it:
+
+```rust
+let len = std::fs::metadata("artifact.bin")?.len();
+let file = std::fs::File::open("artifact.bin")?;
+coordinates::intrinsic_reader(file, len)?;       // [(name, value); 6]
+
+// or drive it yourself, any chunking:
+let mut h = coordinates::IntrinsicHasher::new(len);
+h.update(chunk_a);
+h.update(chunk_b);
+h.finish();                                       // [(name, value); 6]
+```
+
 Extrinsic — purl, parsed to a typed struct and built back to canonical form:
 
 ```rust

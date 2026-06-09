@@ -170,3 +170,42 @@ export async function intrinsic(input: Uint8Array): Promise<Intrinsic> {
     "gitoid-blob-sha256": g256
   };
 }
+
+/**
+ * Streaming counterpart to {@link intrinsic}: feed the input in chunks with {@link update}, then
+ * read every identifier with {@link finish}. The result is identical to passing the whole input to
+ * {@link intrinsic}.
+ *
+ * Note this differs from the Rust and Java implementations: rather than digesting incrementally, it
+ * **buffers** the chunks and hashes them at {@link finish}. The browser's Web Crypto API
+ * (`crypto.subtle.digest`) has no incremental "update" — it only hashes a complete input — and this
+ * module stays isomorphic by using it. So the value here is chunked-feeding ergonomics and
+ * cross-language API parity, not reduced memory use. (That is also why, unlike Rust and Java, no
+ * up-front content length is needed: the gitoid framing length is known once the bytes are
+ * buffered.)
+ */
+export class IntrinsicHasher {
+  #chunks: Uint8Array[] = [];
+
+  /** Feed the next chunk of content. Returns `this`, so calls can be chained. */
+  update(chunk: Uint8Array): this {
+    this.#chunks.push(chunk);
+    return this;
+  }
+
+  /** Concatenate everything fed so far and return every intrinsic identifier. */
+  finish(): Promise<Intrinsic> {
+    return intrinsic(concat(this.#chunks));
+  }
+}
+
+/**
+ * Every intrinsic identifier for the bytes yielded by `source` — the streaming counterpart to
+ * {@link intrinsic} for an async source such as a Node stream or a `ReadableStream` (both are async
+ * iterables). Like {@link IntrinsicHasher}, it buffers the bytes; see that note.
+ */
+export async function intrinsicStream(source: AsyncIterable<Uint8Array>): Promise<Intrinsic> {
+  const hasher = new IntrinsicHasher();
+  for await (const chunk of source) hasher.update(chunk);
+  return hasher.finish();
+}

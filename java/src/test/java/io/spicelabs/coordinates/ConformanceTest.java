@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,6 +44,42 @@ class ConformanceTest {
                       e.getValue().getAsString(),
                       got.get(e.getKey()),
                       e.getKey() + " for input \"" + name + "\"");
+                }
+              }));
+    }
+    return tests;
+  }
+
+  // Same vectors, but driven through the streaming IntrinsicHasher one byte at a time (worst-case
+  // chunk boundaries) and through intrinsic(InputStream, long) — both must match the spec exactly.
+  @TestFactory
+  List<DynamicTest> intrinsicStreamingVectors() throws Exception {
+    String text = new String(Files.readAllBytes(vectorsFile()), StandardCharsets.UTF_8);
+    JsonObject doc = JsonParser.parseString(text).getAsJsonObject();
+
+    List<DynamicTest> tests = new ArrayList<DynamicTest>();
+    for (JsonElement entry : doc.getAsJsonArray("vectors")) {
+      JsonObject vector = entry.getAsJsonObject();
+      final String name = vector.get("name").getAsString();
+      final byte[] input = fromHex(vector.get("input_hex").getAsString());
+      final JsonObject expect = vector.getAsJsonObject("expect");
+      tests.add(
+          dynamicTest(
+              "intrinsic streaming: " + name,
+              () -> {
+                Coordinates.IntrinsicHasher hasher = new Coordinates.IntrinsicHasher(input.length);
+                for (byte b : input) {
+                  hasher.update(new byte[] {b});
+                }
+                Map<String, String> streamed = hasher.finish();
+                Map<String, String> read =
+                    Coordinates.intrinsic(new ByteArrayInputStream(input), input.length);
+                for (Map.Entry<String, JsonElement> e : expect.entrySet()) {
+                  String expected = e.getValue().getAsString();
+                  assertEquals(
+                      expected, streamed.get(e.getKey()), "streamed " + e.getKey() + ": " + name);
+                  assertEquals(
+                      expected, read.get(e.getKey()), "reader " + e.getKey() + ": " + name);
                 }
               }));
     }

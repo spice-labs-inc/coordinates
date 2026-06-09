@@ -25,6 +25,17 @@ await gitoidBlobSha256(bytes); // "gitoid:blob:sha256:c1cf…"  (== `git hash-ob
 await intrinsic(bytes); // { md5, sha1, sha256, sha512, "gitoid-blob-sha1", "gitoid-blob-sha256" }
 ```
 
+Streaming — feed the input in chunks (or from an async source such as a Node stream or a `ReadableStream`) and get the same six identifiers:
+
+```ts
+import { IntrinsicHasher, intrinsicStream } from "@spicelabs/coordinates";
+
+await new IntrinsicHasher().update(chunkA).update(chunkB).finish();
+await intrinsicStream(nodeReadableOrReadableStream); // any AsyncIterable<Uint8Array>
+```
+
+Unlike the Rust and Java versions, this **buffers** the chunks and hashes them at `finish()` — Web Crypto has no incremental digest, so the browser-compatible path can't hash truly incrementally. It's for chunked-feeding ergonomics and cross-language parity, not reduced memory use (and so, unlike Rust/Java, it needs no up-front content length).
+
 Extrinsic — purl, parsed to a typed object and built back to canonical form:
 
 ```ts
