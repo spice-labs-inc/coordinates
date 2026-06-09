@@ -25,6 +25,18 @@ Coordinates.gitoidBlobSha256(bytes); // "gitoid:blob:sha256:c1cf…"  (== `git h
 Coordinates.intrinsic(bytes);        // { md5, sha1, sha256, sha512, gitoid-blob-sha1, gitoid-blob-sha256 }
 ```
 
+Streaming — for a large artifact you don't want to hold in memory, feed it in chunks (or straight from an `InputStream`) and get the same six identifiers in one pass. The length is required up front because `gitoid` framing embeds it:
+
+```java
+long len = Files.size(Paths.get("artifact.bin"));
+try (InputStream in = Files.newInputStream(Paths.get("artifact.bin"))) {
+  Coordinates.intrinsic(in, len); // { md5, …, gitoid-blob-sha256 }
+}
+
+// or drive it yourself, any chunking:
+new Coordinates.IntrinsicHasher(len).update(chunkA).update(chunkB).finish();
+```
+
 Extrinsic — purl, parsed to a typed value and built back to canonical form:
 
 ```java
