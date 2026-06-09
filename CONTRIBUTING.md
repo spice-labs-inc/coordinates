@@ -7,6 +7,7 @@ Thank you for your interest in this project. We welcome all kinds of contributio
 ## Reporting Bugs
 
 Please include:
+
 - A clear, descriptive title
 - Steps to reproduce the issue
 - What you expected to happen versus what actually happened
@@ -20,6 +21,7 @@ Open a [new issue](../../issues/new) to report the problem.
 ## Suggesting Features
 
 Please include:
+
 - A summary of the problem you are trying to solve
 - Why it is important or useful
 - A rough idea of how it could be implemented
@@ -31,6 +33,7 @@ Open a [new issue](../../issues/new) to make the suggestion.
 ## Making Code Contributions
 
 Follow the coding style used in the project:
+
 - The project has linters and formatters configured, so use them
 - Add or update tests if you change features or handle new cases
 - Run existing tests to ensure everything still works
@@ -40,6 +43,7 @@ Follow the coding style used in the project:
    git commit -m "Handle timeouts in API client with retry backoff"
    git push origin fix/handle-timeouts
 ```
+
 - Longer commit messages are welcome when describing the approach, alternatives considered, or other useful details
 - Please keep commits as focused as possible. It is better to have two smaller commits for unrelated changes than one combined commit with a vague title such as "updates" or "changes"
 
@@ -65,6 +69,7 @@ Follow the coding style used in the project:
 ## Collaborating and Reviewing
 
 We use pull request reviews to discuss changes:
+
 - Code improvements or simplifications
 - Better naming or comments
 - Test coverage or performance notes
