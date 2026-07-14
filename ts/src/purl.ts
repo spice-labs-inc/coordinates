@@ -287,6 +287,19 @@ export function parse(input: string): Purl {
 }
 
 export function build(input: PurlInput): string {
+  return buildInternal(input, false);
+}
+
+/**
+ * A Maven-resolvable rendering of a purl: identical to {@link build} except that for
+ * `pkg:maven` the `+` character in the version is left unencoded. All other components and
+ * unsafe characters are encoded exactly as in the canonical form.
+ */
+export function toMavenUrl(input: PurlInput): string {
+  return buildInternal(input, true);
+}
+
+function buildInternal(input: PurlInput, mavenVersion: boolean): string {
   const type = (input.type ?? "").toLowerCase();
   if (!type || !TYPE.test(type)) fail(`invalid type: ${input.type}`);
   if (!input.name) fail("a purl must have a name");
@@ -311,7 +324,13 @@ export function build(input: PurlInput): string {
         .join("/");
   }
   out += "/" + encode(purl.name);
-  if (purl.version) out += "@" + encode(purl.version);
+  if (purl.version) {
+    out +=
+      "@" +
+      (mavenVersion && purl.type === "maven"
+        ? encodeMavenVersion(purl.version)
+        : encode(purl.version));
+  }
 
   const q = purl.qualifiers ?? {};
   const entries = Object.keys(q)
@@ -330,4 +349,8 @@ export function build(input: PurlInput): string {
     if (sp) out += "#" + sp.split("/").map(encode).join("/");
   }
   return out;
+}
+
+function encodeMavenVersion(version: string): string {
+  return version.split("+").map(encode).join("+");
 }

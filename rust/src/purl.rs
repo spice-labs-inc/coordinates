@@ -284,6 +284,17 @@ pub fn build(purl: &Purl) -> Result<String, PurlError> {
 impl Purl {
     /// The canonical purl string for this value.
     pub fn to_canonical(&self) -> Result<String, PurlError> {
+        self.to_string(false)
+    }
+
+    /// A Maven-resolvable rendering of this purl: identical to `to_canonical` except that for
+    /// `pkg:maven` the `+` character in the version is left unencoded. All other components and
+    /// unsafe characters are encoded exactly as in the canonical form.
+    pub fn to_maven_url(&self) -> Result<String, PurlError> {
+        self.to_string(true)
+    }
+
+    fn to_string(&self, maven_version: bool) -> Result<String, PurlError> {
         let r#type = self.r#type.to_ascii_lowercase();
         if !is_valid_type(&r#type) {
             return Err(err(&format!("invalid type: {}", self.r#type)));
@@ -321,7 +332,11 @@ impl Purl {
         if let Some(version) = &p.version {
             if !version.is_empty() {
                 out.push('@');
-                out.push_str(&encode(version));
+                if maven_version && p.r#type == "maven" {
+                    out.push_str(&encode_maven_version(version));
+                } else {
+                    out.push_str(&encode(version));
+                }
             }
         }
 
@@ -434,6 +449,12 @@ fn encode(s: &str) -> String {
         }
     }
     out
+}
+
+/// Percent-encode a Maven version, but leave `+` unencoded so the result matches the literal
+/// version string used in Maven repositories.
+fn encode_maven_version(s: &str) -> String {
+    s.split('+').map(encode).collect::<Vec<_>>().join("+")
 }
 
 fn is_valid_type(t: &str) -> bool {

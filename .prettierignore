@@ -5,3 +5,4 @@ rust/target/
 java/target/
 pnpm-lock.yaml
 ts/pnpm-lock.yaml
+.pnpm-store/

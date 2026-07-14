@@ -4,6 +4,7 @@ target/
 # Node / TypeScript
 node_modules/
 dist/
+.pnpm-store/
 
 # IDE / editor
 .idea/
