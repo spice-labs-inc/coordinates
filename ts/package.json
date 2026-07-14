@@ -21,7 +21,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsc -p tsconfig.json && node --test test/conformance.test.mjs test/purl.test.mjs",
+    "test": "tsc -p tsconfig.json && node --test test/conformance.test.mjs test/purl.test.mjs test/maven.test.mjs",
     "smoke": "tsc -p tsconfig.json && node test/serve.mjs"
   },
   "keywords": [

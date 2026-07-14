@@ -259,6 +259,19 @@ public final class Purl {
 
   /** The canonical purl string for this value. */
   public String toCanonical() {
+    return toString(false);
+  }
+
+  /**
+   * A Maven-resolvable rendering of this purl: identical to {@link #toCanonical()} except that for
+   * {@code pkg:maven} the {@code +} character in the version is left unencoded. All other
+   * components and unsafe characters are encoded exactly as in the canonical form.
+   */
+  public String toMavenUrl() {
+    return toString(true);
+  }
+
+  private String toString(boolean mavenVersion) {
     String t = type == null ? "" : type.toLowerCase(Locale.ROOT);
     if (t.isEmpty() || !TYPE.matcher(t).matches()) {
       throw new PurlException("invalid type: " + type);
@@ -285,7 +298,11 @@ public final class Purl {
     }
     out.append('/').append(encode(p.name));
     if (p.version != null && !p.version.isEmpty()) {
-      out.append('@').append(encode(p.version));
+      out.append('@')
+          .append(
+              mavenVersion && p.type.equals("maven")
+                  ? encodeMavenVersion(p.version)
+                  : encode(p.version));
     }
 
     TreeMap<String, String> sorted = new TreeMap<String, String>();
@@ -424,5 +441,20 @@ public final class Purl {
       }
     }
     return sb.toString();
+  }
+
+  /**
+   * Percent-encode a Maven version, but leave {@code +} unencoded so the result matches the literal
+   * version string used in Maven repositories.
+   */
+  private static String encodeMavenVersion(String s) {
+    StringBuilder out = new StringBuilder();
+    for (String part : s.split("\\+", -1)) {
+      if (out.length() > 0) {
+        out.append('+');
+      }
+      out.append(encode(part));
+    }
+    return out.toString();
   }
 }
