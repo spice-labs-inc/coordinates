@@ -53,8 +53,10 @@ const rules = JSON.parse(readFileSync(new URL("./purl-ns-rules.json", import.met
 const seen = new Set();
 const ruleErrors = [];
 for (const [i, t] of (rules.tests ?? []).entries()) {
-  if (typeof t.description !== "string" || !t.description) ruleErrors.push(`tests[${i}]: description must be a non-empty string`);
-  else if (seen.has(t.description)) ruleErrors.push(`tests[${i}]: duplicate description "${t.description}"`);
+  if (typeof t.description !== "string" || !t.description)
+    ruleErrors.push(`tests[${i}]: description must be a non-empty string`);
+  else if (seen.has(t.description))
+    ruleErrors.push(`tests[${i}]: duplicate description "${t.description}"`);
   seen.add(t.description);
 }
 if (ruleErrors.length) {
