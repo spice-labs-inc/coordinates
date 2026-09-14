@@ -31,8 +31,8 @@ for (const [i, v] of (doc.vectors ?? []).entries()) {
   }
 }
 
-// Names are test IDs shared with Surveyor's integration tests (coordinates/vectors/intrinsic.json#<name>);
-// they must be unique.
+// Names are test IDs (coordinates/vectors/intrinsic.json#<name>) shared with downstream
+// integration tests; they must be unique.
 const names = new Set();
 for (const v of doc.vectors ?? []) {
   if (typeof v.name === "string") {
