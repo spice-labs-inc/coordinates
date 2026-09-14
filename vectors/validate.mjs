@@ -31,8 +31,36 @@ for (const [i, v] of (doc.vectors ?? []).entries()) {
   }
 }
 
+// Names are test IDs (coordinates/vectors/intrinsic.json#<name>) shared with downstream
+// integration tests; they must be unique.
+const names = new Set();
+for (const v of doc.vectors ?? []) {
+  if (typeof v.name === "string") {
+    if (names.has(v.name)) errors.push(`duplicate vector name "${v.name}"`);
+    names.add(v.name);
+  }
+}
+
 if (errors.length) {
   console.error("intrinsic.json invalid:\n" + errors.map((e) => "  - " + e).join("\n"));
   process.exit(1);
 }
 console.log(`intrinsic.json valid — ${doc.vectors.length} vectors`);
+
+// purl-ns-rules.json is Spice-authored: its descriptions are the case IDs and must be unique.
+// (extrinsic.json and purl-types.json are vendored from purl-spec and addressed by index.)
+const rules = JSON.parse(readFileSync(new URL("./purl-ns-rules.json", import.meta.url), "utf8"));
+const seen = new Set();
+const ruleErrors = [];
+for (const [i, t] of (rules.tests ?? []).entries()) {
+  if (typeof t.description !== "string" || !t.description)
+    ruleErrors.push(`tests[${i}]: description must be a non-empty string`);
+  else if (seen.has(t.description))
+    ruleErrors.push(`tests[${i}]: duplicate description "${t.description}"`);
+  seen.add(t.description);
+}
+if (ruleErrors.length) {
+  console.error("purl-ns-rules.json invalid:\n" + ruleErrors.map((e) => "  - " + e).join("\n"));
+  process.exit(1);
+}
+console.log(`purl-ns-rules.json valid — ${(rules.tests ?? []).length} cases`);
