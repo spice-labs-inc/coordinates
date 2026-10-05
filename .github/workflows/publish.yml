@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-      id-token: write # npm provenance
+      id-token: write # npm trusted publishing + provenance
     defaults:
       run:
         working-directory: ts
@@ -65,9 +65,8 @@ jobs:
       - run: pnpm test
       - run: pnpm run build
       - run: npm version "${{ needs.setup.outputs.version }}" --no-git-tag-version --allow-same-version
+      - run: npm install -g npm@latest
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   cargo:
     name: cargo
