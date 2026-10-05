@@ -1,0 +1,434 @@
+{
+  "description": "Spice Labs synthetic vectors for unknown namespaces (NOT vendored from purl-spec). Types that require a namespace can use the sentinel \"~unknown\" when the real one isn't known. Extends the purl test format: parse/build/roundtrip cases may set \"missing_namespace\": \"unknown\" to use the lenient path, \"is_namespace_unknown\" cases take a purl string and expect a boolean, and \"refines\" cases take {known, partial} purl strings and expect a boolean.",
+  "tests": [
+    {
+      "description": "lenient parse gives alpm the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:alpm/name",
+      "expected_output": {
+        "type": "alpm",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives apk the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:apk/name",
+      "expected_output": {
+        "type": "apk",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives bitbucket the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:bitbucket/name",
+      "expected_output": {
+        "type": "bitbucket",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives composer the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:composer/name",
+      "expected_output": {
+        "type": "composer",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives cpan the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:cpan/name",
+      "expected_output": {
+        "type": "cpan",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives deb the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:deb/name",
+      "expected_output": {
+        "type": "deb",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives github the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:github/name",
+      "expected_output": {
+        "type": "github",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives golang the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:golang/name",
+      "expected_output": {
+        "type": "golang",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives huggingface the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:huggingface/name",
+      "expected_output": {
+        "type": "huggingface",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives maven the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:maven/name",
+      "expected_output": {
+        "type": "maven",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives qpkg the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:qpkg/name",
+      "expected_output": {
+        "type": "qpkg",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives rpm the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:rpm/name",
+      "expected_output": {
+        "type": "rpm",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives swift the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:swift/name",
+      "expected_output": {
+        "type": "swift",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse gives vscode-extension the unknown namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:vscode-extension/name",
+      "expected_output": {
+        "type": "vscode-extension",
+        "namespace": "~unknown",
+        "name": "name",
+        "version": null,
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient build gives cpan the unknown namespace",
+      "test_type": "build",
+      "missing_namespace": "unknown",
+      "input": {
+        "type": "cpan",
+        "namespace": null,
+        "name": "Moose",
+        "version": "2.2207",
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_output": "pkg:cpan/~unknown/Moose@2.2207",
+      "expected_failure": false
+    },
+    {
+      "description": "lenient build gives composer the unknown namespace",
+      "test_type": "build",
+      "missing_namespace": "unknown",
+      "input": {
+        "type": "composer",
+        "namespace": null,
+        "name": "Laravel",
+        "version": "10.0.0",
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_output": "pkg:composer/~unknown/laravel@10.0.0",
+      "expected_failure": false
+    },
+    {
+      "description": "strict build still requires a namespace",
+      "test_type": "build",
+      "input": {
+        "type": "cpan",
+        "namespace": null,
+        "name": "Moose",
+        "version": "2.2207",
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "lenient parse keeps an existing namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:cpan/ETHER/Moose@2.2207",
+      "expected_output": {
+        "type": "cpan",
+        "namespace": "ETHER",
+        "name": "Moose",
+        "version": "2.2207",
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse adds no namespace to an optional-namespace type",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:npm/foo@1.0.0",
+      "expected_output": {
+        "type": "npm",
+        "namespace": null,
+        "name": "foo",
+        "version": "1.0.0",
+        "qualifiers": null,
+        "subpath": null
+      },
+      "expected_failure": false
+    },
+    {
+      "description": "lenient parse still rejects a prohibited namespace",
+      "test_type": "parse",
+      "missing_namespace": "unknown",
+      "input": "pkg:pypi/ns/foo",
+      "expected_output": null,
+      "expected_failure": true
+    },
+    {
+      "description": "lenient roundtrip of a namespaceless cpan purl",
+      "test_type": "roundtrip",
+      "missing_namespace": "unknown",
+      "input": "pkg:cpan/Moose@2.2207",
+      "expected_output": "pkg:cpan/~unknown/Moose@2.2207",
+      "expected_failure": false
+    },
+    {
+      "description": "strict roundtrip of the cpan sentinel",
+      "test_type": "roundtrip",
+      "input": "pkg:cpan/~unknown/Moose@2.2207",
+      "expected_output": "pkg:cpan/~unknown/Moose@2.2207",
+      "expected_failure": false
+    },
+    {
+      "description": "strict roundtrip of the composer sentinel",
+      "test_type": "roundtrip",
+      "input": "pkg:composer/~unknown/foo",
+      "expected_output": "pkg:composer/~unknown/foo",
+      "expected_failure": false
+    },
+    {
+      "description": "the cpan sentinel is an unknown namespace",
+      "test_type": "is_namespace_unknown",
+      "input": "pkg:cpan/~unknown/Moose@2.2207",
+      "expected_output": true,
+      "expected_failure": false
+    },
+    {
+      "description": "a real cpan namespace is not unknown",
+      "test_type": "is_namespace_unknown",
+      "input": "pkg:cpan/ETHER/Moose@2.2207",
+      "expected_output": false,
+      "expected_failure": false
+    },
+    {
+      "description": "the sentinel is case-sensitive for cpan",
+      "test_type": "is_namespace_unknown",
+      "input": "pkg:cpan/~UNKNOWN/Moose@2.2207",
+      "expected_output": false,
+      "expected_failure": false
+    },
+    {
+      "description": "the sentinel is lowercased with a case-insensitive composer namespace",
+      "test_type": "is_namespace_unknown",
+      "input": "pkg:composer/~UNKNOWN/foo",
+      "expected_output": true,
+      "expected_failure": false
+    },
+    {
+      "description": "the sentinel only counts for a type that requires a namespace",
+      "test_type": "is_namespace_unknown",
+      "input": "pkg:npm/~unknown/foo",
+      "expected_output": false,
+      "expected_failure": false
+    },
+    {
+      "description": "a known cpan namespace refines the unknown one",
+      "test_type": "refines",
+      "input": {
+        "known": "pkg:cpan/ETHER/Moose@2.2207",
+        "partial": "pkg:cpan/~unknown/Moose@2.2207"
+      },
+      "expected_output": true,
+      "expected_failure": false
+    },
+    {
+      "description": "refines compares qualifiers and subpath too",
+      "test_type": "refines",
+      "input": {
+        "known": "pkg:golang/github.com/gorilla/mux@v1.8.0?goos=linux#internal",
+        "partial": "pkg:golang/~unknown/mux@v1.8.0?goos=linux#internal"
+      },
+      "expected_output": true,
+      "expected_failure": false
+    },
+    {
+      "description": "refines needs the same version",
+      "test_type": "refines",
+      "input": {
+        "known": "pkg:cpan/ETHER/Moose@2.2207",
+        "partial": "pkg:cpan/~unknown/Moose@2.2206"
+      },
+      "expected_output": false,
+      "expected_failure": false
+    },
+    {
+      "description": "refines needs the same qualifiers",
+      "test_type": "refines",
+      "input": {
+        "known": "pkg:cpan/ETHER/Moose@2.2207?arch=x86",
+        "partial": "pkg:cpan/~unknown/Moose@2.2207"
+      },
+      "expected_output": false,
+      "expected_failure": false
+    },
+    {
+      "description": "refines needs the same type",
+      "test_type": "refines",
+      "input": {
+        "known": "pkg:composer/ether/moose@2.2207",
+        "partial": "pkg:cpan/~unknown/moose@2.2207"
+      },
+      "expected_output": false,
+      "expected_failure": false
+    },
+    {
+      "description": "refines needs a known namespace",
+      "test_type": "refines",
+      "input": {
+        "known": "pkg:cpan/~unknown/Moose@2.2207",
+        "partial": "pkg:cpan/~unknown/Moose@2.2207"
+      },
+      "expected_output": false,
+      "expected_failure": false
+    },
+    {
+      "description": "refines needs the partial purl to have the unknown namespace",
+      "test_type": "refines",
+      "input": {
+        "known": "pkg:cpan/~unknown/Moose@2.2207",
+        "partial": "pkg:cpan/ETHER/Moose@2.2207"
+      },
+      "expected_output": false,
+      "expected_failure": false
+    },
+    {
+      "description": "refines is false for identical known purls",
+      "test_type": "refines",
+      "input": {
+        "known": "pkg:cpan/ETHER/Moose@2.2207",
+        "partial": "pkg:cpan/ETHER/Moose@2.2207"
+      },
+      "expected_output": false,
+      "expected_failure": false
+    }
+  ]
+}

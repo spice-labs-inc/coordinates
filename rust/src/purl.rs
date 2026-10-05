@@ -33,6 +33,21 @@ fn err(message: &str) -> PurlError {
     PurlError(message.to_string())
 }
 
+/// The namespace that stands in for an unknown one, for types that require a namespace. It is a
+/// legal purl segment, and no ecosystem that requires a namespace allows a `~` in one, so it can
+/// never collide with a real namespace.
+pub const UNKNOWN_NAMESPACE: &str = "~unknown";
+
+/// What to do when a type that requires a namespace has none.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum MissingNamespace {
+    /// Return an error, as purl-spec requires.
+    #[default]
+    Reject,
+    /// Use [`UNKNOWN_NAMESPACE`] instead.
+    Unknown,
+}
+
 // Per-type normalization + validation, derived from the purl-spec type definitions. Only the types
 // that deviate from the default (keep case, optional namespace) are listed.
 const NS_LOWER: &[&str] = &[
@@ -105,6 +120,13 @@ const NS_PROHIBITED: &[&str] = &[
 
 /// Apply the type's normalization rules, then validate its namespace requirement.
 pub fn normalize(purl: Purl) -> Result<Purl, PurlError> {
+    normalize_with(purl, MissingNamespace::Reject)
+}
+
+/// Apply the type's normalization rules, then validate its namespace requirement. With
+/// [`MissingNamespace::Unknown`], a type that requires a namespace but has none gets
+/// [`UNKNOWN_NAMESPACE`]; every other type is unaffected.
+pub fn normalize_with(purl: Purl, missing: MissingNamespace) -> Result<Purl, PurlError> {
     let Purl {
         r#type,
         mut namespace,
@@ -115,6 +137,12 @@ pub fn normalize(purl: Purl) -> Result<Purl, PurlError> {
     } = purl;
     let ty = r#type.as_str();
 
+    if missing == MissingNamespace::Unknown
+        && NS_REQUIRED.contains(&ty)
+        && namespace.as_deref().unwrap_or("").is_empty()
+    {
+        namespace = Some(UNKNOWN_NAMESPACE.to_string());
+    }
     if NS_LOWER.contains(&ty) {
         if let Some(ns) = namespace.as_mut() {
             *ns = ns.to_ascii_lowercase();
@@ -206,6 +234,11 @@ fn is_chrome_version(s: &str) -> bool {
 }
 
 pub fn parse(input: &str) -> Result<Purl, PurlError> {
+    parse_with(input, MissingNamespace::Reject)
+}
+
+/// Parse a purl, handling a missing required namespace as `missing` directs.
+pub fn parse_with(input: &str, missing: MissingNamespace) -> Result<Purl, PurlError> {
     if input.is_empty() {
         return Err(err("empty purl"));
     }
@@ -267,21 +300,48 @@ pub fn parse(input: &str) -> Result<Purl, PurlError> {
         return Err(err("a purl must have a name"));
     }
 
-    normalize(Purl {
-        r#type,
-        namespace,
-        name,
-        version,
-        qualifiers,
-        subpath,
-    })
+    normalize_with(
+        Purl {
+            r#type,
+            namespace,
+            name,
+            version,
+            qualifiers,
+            subpath,
+        },
+        missing,
+    )
 }
 
 pub fn build(purl: &Purl) -> Result<String, PurlError> {
     purl.to_canonical()
 }
 
+/// Whether `known` is `partial` with its unknown namespace filled in: `partial` has
+/// [`UNKNOWN_NAMESPACE`], `known` has a real namespace, and they are otherwise the same purl. False
+/// if either is invalid.
+pub fn refines(known: &Purl, partial: &Purl) -> bool {
+    let canonical = |p: &Purl| p.to_canonical().and_then(|s| parse(&s));
+    let (Ok(known), Ok(partial)) = (canonical(known), canonical(partial)) else {
+        return false;
+    };
+    if !partial.is_namespace_unknown() || known.is_namespace_unknown() {
+        return false;
+    }
+    let masked = Purl {
+        namespace: Some(UNKNOWN_NAMESPACE.to_string()),
+        ..known
+    };
+    masked == partial
+}
+
 impl Purl {
+    /// Whether this purl's type requires a namespace and it is [`UNKNOWN_NAMESPACE`].
+    pub fn is_namespace_unknown(&self) -> bool {
+        NS_REQUIRED.contains(&self.r#type.as_str())
+            && self.namespace.as_deref() == Some(UNKNOWN_NAMESPACE)
+    }
+
     /// The canonical purl string for this value.
     pub fn to_canonical(&self) -> Result<String, PurlError> {
         self.to_string(false)

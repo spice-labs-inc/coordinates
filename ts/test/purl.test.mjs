@@ -4,6 +4,7 @@
 // Runs the vendored purl-spec suites against this implementation:
 //   ../../vectors/extrinsic.json   — the base spec suite
 //   ../../vectors/purl-types.json  — per-type normalization + validation
+//   ../../vectors/purl-ns-rules.json — per-type namespace required/prohibited rules
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -57,4 +58,25 @@ for (const file of SUITES) {
       }
     });
   }
+}
+
+// ../../vectors/purl-unknown-ns.json — the unknown-namespace sentinel, lenient path, and refines.
+const unknownNs = JSON.parse(
+  readFileSync(new URL("../../vectors/purl-unknown-ns.json", import.meta.url), "utf8")
+);
+for (const [i, c] of unknownNs.tests.entries()) {
+  test(`purl-unknown-ns.json ${c.test_type} [${i}]: ${c.description}`, () => {
+    const options = { missingNamespace: c.missing_namespace ?? "reject" };
+    const run = {
+      parse: () => got(purl.parse(c.input, options)),
+      build: () => purl.build({ ...c.input, qualifiers: c.input.qualifiers ?? {} }, options),
+      roundtrip: () => purl.build(purl.parse(c.input, options)),
+      is_namespace_unknown: () => purl.isNamespaceUnknown(purl.parse(c.input)),
+      refines: () => purl.refines(purl.parse(c.input.known), purl.parse(c.input.partial))
+    }[c.test_type];
+    assert.ok(run, `unknown test_type: ${c.test_type}`);
+    if (c.expected_failure) assert.throws(run);
+    else if (c.test_type === "parse") assert.deepEqual(run(), want(c.expected_output));
+    else assert.equal(run(), c.expected_output);
+  });
 }

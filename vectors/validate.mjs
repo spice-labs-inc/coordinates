@@ -47,20 +47,23 @@ if (errors.length) {
 }
 console.log(`intrinsic.json valid — ${doc.vectors.length} vectors`);
 
-// purl-ns-rules.json is Spice-authored: its descriptions are the case IDs and must be unique.
-// (extrinsic.json and purl-types.json are vendored from purl-spec and addressed by index.)
-const rules = JSON.parse(readFileSync(new URL("./purl-ns-rules.json", import.meta.url), "utf8"));
-const seen = new Set();
-const ruleErrors = [];
-for (const [i, t] of (rules.tests ?? []).entries()) {
-  if (typeof t.description !== "string" || !t.description)
-    ruleErrors.push(`tests[${i}]: description must be a non-empty string`);
-  else if (seen.has(t.description))
-    ruleErrors.push(`tests[${i}]: duplicate description "${t.description}"`);
-  seen.add(t.description);
+// purl-ns-rules.json and purl-unknown-ns.json are Spice-authored: their descriptions are the case IDs
+// and must be unique. (extrinsic.json and purl-types.json are vendored from purl-spec and addressed by
+// index.)
+for (const file of ["purl-ns-rules.json", "purl-unknown-ns.json"]) {
+  const rules = JSON.parse(readFileSync(new URL(`./${file}`, import.meta.url), "utf8"));
+  const seen = new Set();
+  const ruleErrors = [];
+  for (const [i, t] of (rules.tests ?? []).entries()) {
+    if (typeof t.description !== "string" || !t.description)
+      ruleErrors.push(`tests[${i}]: description must be a non-empty string`);
+    else if (seen.has(t.description))
+      ruleErrors.push(`tests[${i}]: duplicate description "${t.description}"`);
+    seen.add(t.description);
+  }
+  if (ruleErrors.length) {
+    console.error(`${file} invalid:\n` + ruleErrors.map((e) => "  - " + e).join("\n"));
+    process.exit(1);
+  }
+  console.log(`${file} valid — ${(rules.tests ?? []).length} cases`);
 }
-if (ruleErrors.length) {
-  console.error("purl-ns-rules.json invalid:\n" + ruleErrors.map((e) => "  - " + e).join("\n"));
-  process.exit(1);
-}
-console.log(`purl-ns-rules.json valid — ${(rules.tests ?? []).length} cases`);

@@ -51,6 +51,17 @@ p.toCanonical(); // "pkg:maven/org.apache.commons/io@1.3.4"
 new Purl("npm", null, "lodash", "4.17.21", null, null).toCanonical(); // "pkg:npm/lodash@4.17.21"
 ```
 
+Some types (cpan, golang, composer, maven, …) require a namespace, which a producer can't always find. Rather than failing, the lenient path uses the sentinel `~unknown`, which can never be a real namespace in those ecosystems. `refines` links such a purl to its fully-known form once the namespace turns up:
+
+```java
+Purl partial = Purl.parse("pkg:cpan/Moose@2.2207", Purl.MissingNamespace.UNKNOWN);
+partial.toCanonical();        // "pkg:cpan/~unknown/Moose@2.2207"
+partial.isNamespaceUnknown(); // true
+Purl.refines(Purl.parse("pkg:cpan/ETHER/Moose@2.2207"), partial); // true
+```
+
+`Purl` values are equal when their canonical forms are.
+
 ## From Scala
 
 Scala (and any other JVM language) uses this same artifact — there is no separate Scala build. Note the single `%` (not `%%`): it is a plain Java jar with no Scala-version suffix.
