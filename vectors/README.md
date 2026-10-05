@@ -23,9 +23,10 @@ We don't restate purl. Two vendored snapshots of the official [`package-url/purl
 - [`extrinsic.json`](extrinsic.json) — the base suite (`tests/spec/specification-test.json`): scheme/type/qualifier rules.
 - [`purl-types.json`](purl-types.json) — per-type normalization + validation (`tests/types/*.json`, all 39 types concatenated, 503 cases): case folding, name rules (pypi `_`→`-`, pub slugging), namespace required/prohibited, and the bespoke grammars (chrome-extension ids, cpan, julia uuid, mlflow/Databricks). To re-sync: copy the upstream files and re-concatenate.
 
-Plus one suite we author (**not** vendored), derived from the same type definitions:
+Plus two suites we author (**not** vendored), derived from the same type definitions:
 
 - [`purl-ns-rules.json`](purl-ns-rules.json) — 31 synthetic parse-failure cases, one per type, each isolating the namespace **required**/**prohibited** rule. The vendored suite only exercises that rule for the few types with upstream failure cases, so this is what catches a per-implementation rule-table typo (drift between the TS/Java/Rust tables) in the shared conformance run.
+- [`purl-unknown-ns.json`](purl-unknown-ns.json) — the unknown-namespace convention: the `~unknown` sentinel for types that require a namespace, the lenient path that supplies it, and `refines`. It extends the purl test format: `parse`/`build`/`roundtrip` cases may set `"missing_namespace": "unknown"`; `is_namespace_unknown` cases take a purl string and expect a boolean; `refines` cases take `{known, partial}` purl strings and expect a boolean.
 
 Each case is a `parse`, `build`, or `roundtrip` over a purl string and its components.
 

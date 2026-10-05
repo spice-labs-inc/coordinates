@@ -46,6 +46,15 @@ purl.parse("pkg:npm/%40angular/core@17.0.0");
 purl.build({ type: "npm", name: "lodash", version: "4.17.21" }); // "pkg:npm/lodash@4.17.21"
 ```
 
+Some types (cpan, golang, composer, maven, …) require a namespace, which a producer can't always find. Rather than failing, the lenient path uses the sentinel `~unknown`, which can never be a real namespace in those ecosystems. `refines` links such a purl to its fully-known form once the namespace turns up:
+
+```ts
+const partial = purl.parse("pkg:cpan/Moose@2.2207", { missingNamespace: "unknown" });
+purl.build(partial); // "pkg:cpan/~unknown/Moose@2.2207"
+purl.isNamespaceUnknown(partial); // true
+purl.refines(purl.parse("pkg:cpan/ETHER/Moose@2.2207"), partial); // true
+```
+
 ## Develop
 
 ```bash

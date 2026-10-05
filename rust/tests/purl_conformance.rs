@@ -6,7 +6,7 @@
 
 use std::collections::BTreeMap;
 
-use coordinates::purl::{self, Purl};
+use coordinates::purl::{self, MissingNamespace, Purl};
 use serde_json::Value;
 
 #[test]
@@ -56,6 +56,81 @@ fn purl_vectors() {
         }
     }
     assert_eq!(count, 552, "expected 552 purl cases");
+}
+
+#[test]
+fn unknown_namespace_vectors() {
+    let path = format!(
+        "{}/../vectors/purl-unknown-ns.json",
+        env!("CARGO_MANIFEST_DIR")
+    );
+    let text = std::fs::read_to_string(&path).unwrap_or_else(|_| panic!("read {}", path));
+    let doc: Value = serde_json::from_str(&text).unwrap();
+
+    let mut count = 0;
+    for case in doc["tests"].as_array().unwrap() {
+        let test_type = case["test_type"].as_str().unwrap();
+        let fail = case["expected_failure"].as_bool().unwrap_or(false);
+        let input = &case["input"];
+        let expected = &case["expected_output"];
+        let desc = case["description"].as_str().unwrap_or("");
+        let missing = match case["missing_namespace"].as_str() {
+            Some("unknown") => MissingNamespace::Unknown,
+            _ => MissingNamespace::Reject,
+        };
+
+        match test_type {
+            "parse" => {
+                let result = purl::parse_with(input.as_str().unwrap(), missing);
+                if fail {
+                    assert!(result.is_err(), "expected parse failure: {}", desc);
+                } else {
+                    let parsed = result.unwrap_or_else(|e| panic!("{}: {}", desc, e));
+                    assert_components(&parsed, expected, desc);
+                }
+            }
+            "build" => {
+                let result = purl::normalize_with(purl_from_json(input), missing)
+                    .and_then(|p| purl::build(&p));
+                if fail {
+                    assert!(result.is_err(), "expected build failure: {}", desc);
+                } else {
+                    assert_eq!(result.unwrap(), expected.as_str().unwrap(), "{}", desc);
+                }
+            }
+            "roundtrip" => {
+                let result = purl::parse_with(input.as_str().unwrap(), missing)
+                    .and_then(|p| purl::build(&p));
+                if fail {
+                    assert!(result.is_err(), "expected roundtrip failure: {}", desc);
+                } else {
+                    assert_eq!(result.unwrap(), expected.as_str().unwrap(), "{}", desc);
+                }
+            }
+            "is_namespace_unknown" => {
+                let parsed = purl::parse(input.as_str().unwrap()).unwrap();
+                assert_eq!(
+                    parsed.is_namespace_unknown(),
+                    expected.as_bool().unwrap(),
+                    "{}",
+                    desc
+                );
+            }
+            "refines" => {
+                let known = purl::parse(input["known"].as_str().unwrap()).unwrap();
+                let partial = purl::parse(input["partial"].as_str().unwrap()).unwrap();
+                assert_eq!(
+                    purl::refines(&known, &partial),
+                    expected.as_bool().unwrap(),
+                    "{}",
+                    desc
+                );
+            }
+            other => panic!("unknown test_type: {}", other),
+        }
+        count += 1;
+    }
+    assert_eq!(count, 36, "expected 36 unknown-namespace cases");
 }
 
 fn purl_from_json(c: &Value) -> Purl {

@@ -44,6 +44,17 @@ assert_eq!(p.version.as_deref(), Some("1.0.0"));
 purl::build(&p).unwrap(); // "pkg:cargo/serde@1.0.0"
 ```
 
+Some types (cpan, golang, composer, maven, …) require a namespace, which a producer can't always find. Rather than failing, the lenient path uses the sentinel `~unknown`, which can never be a real namespace in those ecosystems. `refines` links such a purl to its fully-known form once the namespace turns up:
+
+```rust
+use coordinates::purl::MissingNamespace;
+
+let partial = purl::parse_with("pkg:cpan/Moose@2.2207", MissingNamespace::Unknown).unwrap();
+purl::build(&partial).unwrap(); // "pkg:cpan/~unknown/Moose@2.2207"
+assert!(partial.is_namespace_unknown());
+assert!(purl::refines(&purl::parse("pkg:cpan/ETHER/Moose@2.2207").unwrap(), &partial));
+```
+
 ## Develop
 
 ```bash

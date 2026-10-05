@@ -77,6 +77,77 @@ class PurlConformanceTest {
     return tests;
   }
 
+  @TestFactory
+  List<DynamicTest> unknownNamespaceVectors() throws Exception {
+    List<DynamicTest> tests = new ArrayList<DynamicTest>();
+    String text =
+        new String(Files.readAllBytes(vectorFile("purl-unknown-ns.json")), StandardCharsets.UTF_8);
+    JsonObject doc = JsonParser.parseString(text).getAsJsonObject();
+    for (JsonElement entry : doc.getAsJsonArray("tests")) {
+      final JsonObject c = entry.getAsJsonObject();
+      final String type = c.get("test_type").getAsString();
+      final boolean fail = c.has("expected_failure") && c.get("expected_failure").getAsBoolean();
+      final JsonElement input = c.get("input");
+      final JsonElement expected = c.get("expected_output");
+      final String desc = c.get("description").getAsString();
+      final Purl.MissingNamespace missing =
+          "unknown".equals(str(c, "missing_namespace"))
+              ? Purl.MissingNamespace.UNKNOWN
+              : Purl.MissingNamespace.REJECT;
+
+      tests.add(
+          dynamicTest(
+              "purl-unknown-ns.json " + type + ": " + desc,
+              () -> {
+                if ("parse".equals(type)) {
+                  if (fail) {
+                    assertThrows(
+                        Purl.PurlException.class, () -> Purl.parse(input.getAsString(), missing));
+                  } else {
+                    assertComponents(
+                        Purl.parse(input.getAsString(), missing), expected.getAsJsonObject(), desc);
+                  }
+                } else if ("build".equals(type)) {
+                  if (fail) {
+                    assertThrows(
+                        Purl.PurlException.class,
+                        () -> Purl.normalize(fromComponents(input.getAsJsonObject()), missing));
+                  } else {
+                    assertEquals(
+                        expected.getAsString(),
+                        Purl.normalize(fromComponents(input.getAsJsonObject()), missing)
+                            .toCanonical());
+                  }
+                } else if ("roundtrip".equals(type)) {
+                  if (fail) {
+                    assertThrows(
+                        Purl.PurlException.class, () -> Purl.parse(input.getAsString(), missing));
+                  } else {
+                    assertEquals(
+                        expected.getAsString(),
+                        Purl.parse(input.getAsString(), missing).toCanonical());
+                  }
+                } else if ("is_namespace_unknown".equals(type)) {
+                  assertEquals(
+                      expected.getAsBoolean(),
+                      Purl.parse(input.getAsString()).isNamespaceUnknown(),
+                      desc);
+                } else if ("refines".equals(type)) {
+                  JsonObject pair = input.getAsJsonObject();
+                  assertEquals(
+                      expected.getAsBoolean(),
+                      Purl.refines(
+                          Purl.parse(pair.get("known").getAsString()),
+                          Purl.parse(pair.get("partial").getAsString())),
+                      desc);
+                } else {
+                  throw new IllegalStateException("unknown test_type: " + type);
+                }
+              }));
+    }
+    return tests;
+  }
+
   private static Purl fromComponents(JsonObject c) {
     Map<String, String> qualifiers = new LinkedHashMap<String, String>();
     JsonElement q = c.get("qualifiers");

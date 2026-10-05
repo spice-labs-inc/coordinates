@@ -27,6 +27,23 @@ export interface PurlInput {
 
 export class PurlError extends Error {}
 
+/**
+ * The namespace that stands in for an unknown one, for types that require a namespace. It is a
+ * legal purl segment, and no ecosystem that requires a namespace allows a `~` in one, so it can
+ * never collide with a real namespace.
+ */
+export const UNKNOWN_NAMESPACE = "~unknown";
+
+/**
+ * What to do when a type that requires a namespace has none: throw (the default), or use
+ * {@link UNKNOWN_NAMESPACE}.
+ */
+export type MissingNamespace = "reject" | "unknown";
+
+export interface PurlOptions {
+  missingNamespace?: MissingNamespace;
+}
+
 const TYPE = /^[a-zA-Z][a-zA-Z0-9.+-]*$/;
 const QUALIFIER_KEY = /^[a-zA-Z0-9.\-_]+$/;
 const UTF8 = new TextEncoder();
@@ -186,10 +203,17 @@ addRule(
   { ns: "prohibited" }
 );
 
-/** Apply the type's normalization rules, then validate its namespace requirement. */
-export function normalize(purl: Purl): Purl {
+/**
+ * Apply the type's normalization rules, then validate its namespace requirement. With
+ * `missingNamespace: "unknown"`, a type that requires a namespace but has none gets
+ * {@link UNKNOWN_NAMESPACE}; every other type is unaffected.
+ */
+export function normalize(purl: Purl, options: PurlOptions = {}): Purl {
   const r = TYPE_RULES[purl.type] ?? {};
   let { namespace, name, version } = purl;
+  if (options.missingNamespace === "unknown" && r.ns === "required" && !namespace) {
+    namespace = UNKNOWN_NAMESPACE;
+  }
   if (namespace !== null && r.nsLower) namespace = namespace.toLowerCase();
   if (r.nameLower) name = name.toLowerCase();
   if (r.nameRule === "pypi") name = name.replace(/_/g, "-");
@@ -229,7 +253,7 @@ export function normalize(purl: Purl): Purl {
   };
 }
 
-export function parse(input: string): Purl {
+export function parse(input: string, options: PurlOptions = {}): Purl {
   if (typeof input !== "string" || input.length === 0) fail("empty purl");
 
   const colon = input.indexOf(":");
@@ -283,11 +307,33 @@ export function parse(input: string): Purl {
   const name = decode(nameVersion);
   if (name.length === 0) fail("a purl must have a name");
 
-  return normalize({ type, namespace, name, version, qualifiers, subpath });
+  return normalize({ type, namespace, name, version, qualifiers, subpath }, options);
 }
 
-export function build(input: PurlInput): string {
-  return buildInternal(input, false);
+/** Whether this purl's type requires a namespace and it is {@link UNKNOWN_NAMESPACE}. */
+export function isNamespaceUnknown(purl: PurlInput): boolean {
+  return TYPE_RULES[purl.type]?.ns === "required" && purl.namespace === UNKNOWN_NAMESPACE;
+}
+
+/**
+ * Whether `known` is `partial` with its unknown namespace filled in: `partial` has
+ * {@link UNKNOWN_NAMESPACE}, `known` has a real namespace, and they are otherwise the same purl.
+ * False if either is invalid.
+ */
+export function refines(known: PurlInput, partial: PurlInput): boolean {
+  try {
+    const k = parse(build(known));
+    const p = parse(build(partial));
+    if (!isNamespaceUnknown(p) || isNamespaceUnknown(k)) return false;
+    return build({ ...k, namespace: UNKNOWN_NAMESPACE }) === build(p);
+  } catch (e) {
+    if (e instanceof PurlError) return false;
+    throw e;
+  }
+}
+
+export function build(input: PurlInput, options: PurlOptions = {}): string {
+  return buildInternal(input, false, options);
 }
 
 /**
@@ -295,23 +341,26 @@ export function build(input: PurlInput): string {
  * `pkg:maven` the `+` character in the version is left unencoded. All other components and
  * unsafe characters are encoded exactly as in the canonical form.
  */
-export function toMavenUrl(input: PurlInput): string {
-  return buildInternal(input, true);
+export function toMavenUrl(input: PurlInput, options: PurlOptions = {}): string {
+  return buildInternal(input, true, options);
 }
 
-function buildInternal(input: PurlInput, mavenVersion: boolean): string {
+function buildInternal(input: PurlInput, mavenVersion: boolean, options: PurlOptions): string {
   const type = (input.type ?? "").toLowerCase();
   if (!type || !TYPE.test(type)) fail(`invalid type: ${input.type}`);
   if (!input.name) fail("a purl must have a name");
 
-  const purl = normalize({
-    type,
-    namespace: input.namespace ?? null,
-    name: input.name,
-    version: input.version ?? null,
-    qualifiers: input.qualifiers ?? {},
-    subpath: input.subpath ?? null
-  });
+  const purl = normalize(
+    {
+      type,
+      namespace: input.namespace ?? null,
+      name: input.name,
+      version: input.version ?? null,
+      qualifiers: input.qualifiers ?? {},
+      subpath: input.subpath ?? null
+    },
+    options
+  );
 
   let out = "pkg:" + purl.type;
   if (purl.namespace) {

@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
@@ -27,6 +28,21 @@ public final class Purl {
     public PurlException(String message) {
       super(message);
     }
+  }
+
+  /**
+   * The namespace that stands in for an unknown one, for types that require a namespace. It is a
+   * legal purl segment, and no ecosystem that requires a namespace allows a {@code ~} in one, so it
+   * can never collide with a real namespace.
+   */
+  public static final String UNKNOWN_NAMESPACE = "~unknown";
+
+  /** What to do when a type that requires a namespace has none. */
+  public enum MissingNamespace {
+    /** Throw a {@link PurlException}, as purl-spec requires. */
+    REJECT,
+    /** Use {@link #UNKNOWN_NAMESPACE} instead. */
+    UNKNOWN
   }
 
   private static final Pattern TYPE = Pattern.compile("^[a-zA-Z][a-zA-Z0-9.+-]*$");
@@ -134,7 +150,21 @@ public final class Purl {
 
   /** Apply the type's normalization rules, then validate its namespace requirement. */
   public static Purl normalize(Purl p) {
+    return normalize(p, MissingNamespace.REJECT);
+  }
+
+  /**
+   * Apply the type's normalization rules, then validate its namespace requirement. With {@link
+   * MissingNamespace#UNKNOWN}, a type that requires a namespace but has none gets {@link
+   * #UNKNOWN_NAMESPACE}; every other type is unaffected.
+   */
+  public static Purl normalize(Purl p, MissingNamespace missing) {
     String namespace = p.namespace;
+    if (missing == MissingNamespace.UNKNOWN
+        && NS_REQUIRED.contains(p.type)
+        && (namespace == null || namespace.isEmpty())) {
+      namespace = UNKNOWN_NAMESPACE;
+    }
     String name = p.name;
     String version = p.version;
     if (namespace != null && NS_LOWER.contains(p.type)) {
@@ -184,6 +214,11 @@ public final class Purl {
   }
 
   public static Purl parse(String input) {
+    return parse(input, MissingNamespace.REJECT);
+  }
+
+  /** Parse a purl, handling a missing required namespace as {@code missing} directs. */
+  public static Purl parse(String input, MissingNamespace missing) {
     if (input == null || input.isEmpty()) {
       throw new PurlException("empty purl");
     }
@@ -254,7 +289,71 @@ public final class Purl {
       throw new PurlException("a purl must have a name");
     }
 
-    return normalize(new Purl(type, namespace, name, version, qualifiers, subpath));
+    return normalize(new Purl(type, namespace, name, version, qualifiers, subpath), missing);
+  }
+
+  /** Whether this purl's type requires a namespace and it is {@link #UNKNOWN_NAMESPACE}. */
+  public boolean isNamespaceUnknown() {
+    return type != null && NS_REQUIRED.contains(type) && UNKNOWN_NAMESPACE.equals(namespace);
+  }
+
+  /**
+   * Whether {@code known} is {@code partial} with its unknown namespace filled in: {@code partial}
+   * has {@link #UNKNOWN_NAMESPACE}, {@code known} has a real namespace, and they are otherwise the
+   * same purl. False if either is invalid.
+   */
+  public static boolean refines(Purl known, Purl partial) {
+    try {
+      Purl k = parse(known.toCanonical());
+      Purl p = parse(partial.toCanonical());
+      if (!p.isNamespaceUnknown() || k.isNamespaceUnknown()) {
+        return false;
+      }
+      Purl masked = new Purl(k.type, UNKNOWN_NAMESPACE, k.name, k.version, k.qualifiers, k.subpath);
+      return masked.toCanonical().equals(p.toCanonical());
+    } catch (PurlException e) {
+      return false;
+    }
+  }
+
+  // The canonical form, or null if this purl is invalid.
+  private String canonicalOrNull() {
+    try {
+      return toCanonical();
+    } catch (PurlException e) {
+      return null;
+    }
+  }
+
+  /** Two purls are equal if they have the same canonical form (or, if invalid, the same fields). */
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    }
+    if (!(other instanceof Purl)) {
+      return false;
+    }
+    Purl that = (Purl) other;
+    String a = canonicalOrNull();
+    String b = that.canonicalOrNull();
+    if (a != null || b != null) {
+      return a != null && a.equals(b);
+    }
+    return Objects.equals(type, that.type)
+        && Objects.equals(namespace, that.namespace)
+        && Objects.equals(name, that.name)
+        && Objects.equals(version, that.version)
+        && qualifiers.equals(that.qualifiers)
+        && Objects.equals(subpath, that.subpath);
+  }
+
+  @Override
+  public int hashCode() {
+    String canonical = canonicalOrNull();
+    return canonical != null
+        ? canonical.hashCode()
+        : Objects.hash(type, namespace, name, version, qualifiers, subpath);
   }
 
   /** The canonical purl string for this value. */
