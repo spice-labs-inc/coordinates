@@ -79,6 +79,6 @@ Purl.parse("pkg:maven/org.apache.commons/io@1.3.4").name // "io"
 ## Develop
 
 ```bash
-mvn test       # runs ../vectors against this implementation
-mvn package
+./mvnw test       # runs ../vectors against this implementation
+./mvnw package
 ```
