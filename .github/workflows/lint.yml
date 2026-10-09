@@ -73,4 +73,4 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: maven
-      - run: mvn -B -ntp spotless:check
+      - run: ./mvnw -B -ntp spotless:check
