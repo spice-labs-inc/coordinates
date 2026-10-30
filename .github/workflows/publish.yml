@@ -20,6 +20,7 @@ jobs:
       channel-id: ${{ steps.notify.outputs.channel-id }}
     steps:
       - name: Notify release start
+        if: vars.SPICE_LABS_UPLOADS == 'on'
         id: notify
         uses: spice-labs-inc/action-release-notification@v3.3
         with:
@@ -159,6 +160,7 @@ jobs:
             echo "status=deployment-failure" >> "$GITHUB_OUTPUT"
           fi
       - name: Notify result
+        if: vars.SPICE_LABS_UPLOADS == 'on'
         uses: spice-labs-inc/action-release-notification@v3.3
         with:
           type: ${{ steps.status.outputs.status }}
